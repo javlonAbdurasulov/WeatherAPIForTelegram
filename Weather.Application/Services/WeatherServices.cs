@@ -36,8 +36,10 @@ namespace Weather.Application.Services
             for (int i = 1; i < 24; i+=3)
             {
                 var temp = Math.Round(weather.hourly.temperature_2m[i]);
-                res += $"Time: {i}:00  <=>  {temp} °C\n";
+                res += $"Time: {i+1}:00  <=>  {temp} °C\n";
             }
+            return res;
+            #region
             //int startIndex = 0;
             //int takeCount = 7;
 
@@ -57,7 +59,7 @@ namespace Weather.Application.Services
             //maxNightTemperature = Math.Round(maxNightTemperature);
 
             //res = $"Day: {maxNightTemperature} °C \nNight: {maxMorningTemperature} °C";
-            return res;
+            #endregion
         }
     }
 }

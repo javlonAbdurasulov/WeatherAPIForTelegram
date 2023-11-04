@@ -44,14 +44,15 @@ namespace Weather.Application
         {
             ////5 soat ayirishim kere ekan
             ///
-            if (update.Message.Text == "Today")
+            //if (update.Message.Text == "Today")
+            if (update.Message != null && update.Message.Text == "Weather Today")
             {
                 await Console.Out.WriteLineAsync("--------"+Count+"------");
                 Count++;
                 string res = await _weatherServices.GetWeatherToday();
 
                 await botClient.SendTextMessageAsync(
-                    chatId: /*5559328968*/update.Message.Chat.Id,
+                    chatId: update.Message.Chat.Id,
                     text: res
                 );
             }
