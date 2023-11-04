@@ -39,6 +39,7 @@ namespace Weather.Application.Services
                 res += $"Time: {i+1}:00  <=>  {temp} °C\n";
             }
             return res;
+
             #region
             //int startIndex = 0;
             //int takeCount = 7;
