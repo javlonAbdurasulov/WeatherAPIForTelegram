@@ -31,33 +31,32 @@ namespace Weather.Application.Services
 
         public async Task<string> GetWeatherToday()
         {
-            var weather = await GetWeatherIN7();
+            WeatherForecast weather = await GetWeatherIN7();
+            string res = "City:  Tashkent\n";
+            for (int i = 1; i < 24; i+=3)
+            {
+                var temp = Math.Round(weather.hourly.temperature_2m[i]);
+                res += $"Time: {i}:00  <=>  {temp} °C\n";
+            }
+            //int startIndex = 0;
+            //int takeCount = 7;
 
-            //var weather = await _weatherServices.GetWeatherIN7();
-            int startIndex = 0;
-            int takeCount = 7;
+            //double maxMorningTemperature = weather.hourly.temperature_2m
+            //    .Skip(startIndex)
+            //    .Take(takeCount)
+            //    .Average();
+            //maxMorningTemperature = Math.Round(maxMorningTemperature);
 
+            //startIndex += takeCount;
+            //takeCount = 17;
 
-            //if (startIndex >= 0 && takeCount < weather.hourly.temperature_2m.Count && startIndex <= takeCount)
-            //{
-            double maxMorningTemperature = weather.hourly.temperature_2m
-                .Skip(startIndex)
-                .Take(takeCount)
-                .Average();
-            maxMorningTemperature = Math.Round(maxMorningTemperature);
-            //}
-            startIndex += takeCount;
-            takeCount = 17;
-            //if (startIndex >= 0 && takeCount < weather.hourly.temperature_2m.Count && startIndex <= takeCount)
-            //{
-            double maxNightTemperature = weather.hourly.temperature_2m
-                    .Skip(startIndex)
-                    .Take(takeCount)
-                    .Max();
-            maxNightTemperature = Math.Round(maxNightTemperature);
-            //}
-            //var morning = weather.hourly.time.Where(x =>  );
-            string res = $"Day: {maxNightTemperature} °C \nNight: {maxMorningTemperature} °C";
+            //double maxNightTemperature = weather.hourly.temperature_2m
+            //        .Skip(startIndex)
+            //        .Take(takeCount)
+            //        .Max();
+            //maxNightTemperature = Math.Round(maxNightTemperature);
+
+            //res = $"Day: {maxNightTemperature} °C \nNight: {maxMorningTemperature} °C";
             return res;
         }
     }

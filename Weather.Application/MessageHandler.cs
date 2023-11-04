@@ -42,7 +42,9 @@ namespace Weather.Application
         //}
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            if (update.Message.Text == "Weather Today")
+            ////5 soat ayirishim kere ekan
+            ///
+            if (update.Message.Text == "Today")
             {
                 await Console.Out.WriteLineAsync("--------"+Count+"------");
                 Count++;

@@ -18,6 +18,7 @@ namespace WeatherAPIForTelegram
             builder.Services.AddHttpClient();
 
             builder.Services.AddSingleton<IWeatherServices, WeatherServices>();
+            //builder.Services.AddScoped<IWeatherServices, WeatherServices>();
             //builder.Services.AddSingleton<MessageHandler>();
             
             TelegramBotClient client = new TelegramBotClient
@@ -25,8 +26,10 @@ namespace WeatherAPIForTelegram
             //await client.DeleteWebhookAsync();
             //("6973642924:AAHvp441ILZGAwhNba6MVe-sJkenTXYNaPE");
             //client.StartReceiving(new MessageHandler());
+
             var serviceProvider = builder.Services.BuildServiceProvider();
             var messageHandler = new MessageHandler(serviceProvider.GetRequiredService<IWeatherServices>());
+
             client.StartReceiving(messageHandler);
 
             builder.Services.AddSingleton
