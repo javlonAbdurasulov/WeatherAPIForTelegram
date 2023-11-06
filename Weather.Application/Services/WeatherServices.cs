@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -10,32 +11,48 @@ using Weather.Domain.Entities;
 
 namespace Weather.Application.Services
 {
-    public class WeatherServices : IWeatherServices
+    public class WeatherServices : IWeatherServices /*, IHttpClientService*/
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
-        public readonly string _uri;
+        public string _uri;
         public static string NowCity = "Tashkent";
-        public WeatherServices(HttpClient httpClient, IConfiguration configuration)
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public WeatherServices(IHttpClientFactory httpClientFactory,/*HttpClient httpClient, */IConfiguration configuration)
         {
-            _httpClient = httpClient;
+            //_httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _uri = _configuration.GetSection("BaseAddress")["Tashkent"];
-            _httpClient.BaseAddress = new Uri($"{_uri}");
+            //_httpClient.BaseAddress = new Uri($"{_uri}");
         }
+        //////////////////////////
+        //public void Dispose()
+        //{
+        //    _httpClient.Dispose();
+        //}
+        //////////////////////////
         public async Task<WeatherForecast> GetWeatherIN7()
         {
+            using var httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri(_uri);
 
-            var response = await _httpClient.GetAsync("");
+            var response = await httpClient.GetAsync("").ConfigureAwait(false);//используется для предотвращения
+                                                 //захвата текущего контекста синхронизации, что может помочь избежать блокировок.
             var responseModel = await response.Content.ReadFromJsonAsync<WeatherForecast>();
 
             return responseModel;
+            //var response = await _httpClient.GetAsync("").ConfigureAwait(false);
+            //var responseModel = await response.Content.ReadFromJsonAsync<WeatherForecast>();
+
+            //return responseModel;
         }
 
         public async Task<string> GetWeatherToday()
         {
             WeatherForecast weather = await GetWeatherIN7();
-            string res = $"Today: {DateTime.Now.ToShortDateString()}\n\nCity:  {NowCity}\n\n";
+            string res = $"Погода будет классная, если солнышко улыбнется, улыбнитесь принцесса🌞\r\n\nА пока в {NowCity}\nDate: {DateTime.Now.ToShortDateString()}\n\n";
             for (int i = 1; i < 24; i += 3)
             {
                 var temp = Math.Round(weather.hourly.temperature_2m[i]);
@@ -84,10 +101,13 @@ namespace Weather.Application.Services
         }
         public async Task<string> ChangeCity(string city)
         {
-            _httpClient.BaseAddress = new Uri(_configuration.GetSection("BaseAddress")[city]);
+            //using var httpClient = _httpClientFactory.CreateClient();
+            //httpClient.BaseAddress = new Uri(_configuration.GetSection("BaseAddress")[city]);
+            _uri = _configuration.GetSection("BaseAddress")[city];
             NowCity = city;
             return city;
 
         }
+
     }
 }

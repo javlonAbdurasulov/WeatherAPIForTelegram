@@ -16,25 +16,50 @@ namespace WeatherAPIForTelegram
 
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
-
-            builder.Services.AddSingleton<IWeatherServices, WeatherServices>();
-            //builder.Services.AddScoped<IWeatherServices, WeatherServices>();
+            #region
+            //builder.Services.AddSingleton<IWeatherServices, WeatherServices>();
+            builder.Services.AddScoped<IWeatherServices, WeatherServices>();
             //builder.Services.AddSingleton<MessageHandler>();
-            
+
+
+            builder.Services.AddScoped<MessageHandler>();
+            #endregion
+
             TelegramBotClient client = new TelegramBotClient
                 (builder.Configuration.GetSection("Tokens")["token1"]);
             //await client.DeleteWebhookAsync();
             //("6973642924:AAHvp441ILZGAwhNba6MVe-sJkenTXYNaPE");
             //client.StartReceiving(new MessageHandler());
 
+            #region
             var serviceProvider = builder.Services.BuildServiceProvider();
             var messageHandler = new MessageHandler(serviceProvider.GetRequiredService<IWeatherServices>());
+
+            //var serviceProvider = builder.Services.BuildServiceProvider();
+            //using (var scope = serviceProvider.CreateScope())
+            //{
+            //    var scopedServiceProvider = scope.ServiceProvider;
+            //    var messageHandler = new MessageHandler(scopedServiceProvider.GetRequiredService<IWeatherServices>());
+
+            //    client.StartReceiving(messageHandler);
+            //}
 
             client.StartReceiving(messageHandler);
 
             builder.Services.AddSingleton
                 (client);
-            
+            #endregion
+
+            ////////////////////////////
+            //builder.Services.AddSingleton<ITelegramBotClient>(client);
+            //builder.Services.AddSingleton<IWeatherServices, WeatherServices>();
+            //builder.Services.AddScoped<MessageHandler>();
+
+
+
+
+            ////////////////////////////
+
             //(new TelegramBotClient(builder.Configuration.GetConnectionString("Token")));
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

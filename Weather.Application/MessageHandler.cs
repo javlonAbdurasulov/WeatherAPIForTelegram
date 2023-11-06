@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -26,7 +27,15 @@ namespace Weather.Application
         }
         public Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var ErrorMessage = exception switch
+            {
+                ApiRequestException apiRequestException
+                    => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
+                _ => exception.ToString()
+            };
+
+            Console.WriteLine(ErrorMessage);
+            return Task.CompletedTask;
         }
 
         //public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -61,6 +70,7 @@ namespace Weather.Application
                 Count++;
 
                 string res = await _weatherServices.GetWeatherToday();
+                //_weatherServices.Dispose();
 
                 //var sentMsg = await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, text: "",replyMarkup: new ReplyKeyboardRemove());
 
@@ -107,6 +117,7 @@ namespace Weather.Application
 
                 //await botClient.DeleteMessageAsync(chatId: update.Message.Chat.Id, sentMsg.MessageId);
                 var res = await _weatherServices.GetWeatherWeek();
+                //_weatherServices.Dispose();
                 await botClient.SendTextMessageAsync(
                     chatId: update.Message.Chat.Id, 
                     text: res
@@ -115,7 +126,7 @@ namespace Weather.Application
             }
             else if(update.Message != null && update.Message.Text == "Поменять город")
             {
-                //var sentMsg = await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, text: "",replyMarkup: new ReplyKeyboardRemove());
+                //var sentMsg = await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, text: "", replyMarkup: new ReplyKeyboardRemove());
 
                 //await botClient.DeleteMessageAsync(chatId: update.Message.Chat.Id, sentMsg.MessageId);
 
@@ -133,6 +144,7 @@ namespace Weather.Application
                     text: "Menu:",
                     replyMarkup: GetButtons()
                 );
+                #region
                 //await botClient.SendTextMessageAsync(
                 //    chatId: update.Message.Chat.Id,
                 //    text: "Share your contact & location",
@@ -141,18 +153,20 @@ namespace Weather.Application
                 //            KeyboardButton.WithRequestLocation("Share Location") }
                 //    )
                 //);
+                #endregion
             }
             else if(update.Message != null && 
                     update.Message.Text == "Tashkent" ||
                     update.Message.Text == "Samarkand" ||
                     update.Message.Text == "Bukhara" 
-                )
+                    )
             {
                 //var sentMsg = await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id, text: "", replyMarkup: new ReplyKeyboardRemove());
 
                 //await botClient.DeleteMessageAsync(chatId: update.Message.Chat.Id, sentMsg.MessageId);
 
                 var res = await _weatherServices.ChangeCity(update.Message.Text);
+                //_weatherServices.Dispose();
                 string City = res;
                 NowCity = City;
                 await botClient.SendTextMessageAsync(
@@ -180,6 +194,7 @@ namespace Weather.Application
                     new KeyboardButton("??"),
                 }
             };
+            //buttons.Add(new List<KeyboardButton> { new KeyboardButton("s") });
             return new ReplyKeyboardMarkup(buttons);
         }
         private IReplyMarkup? GetButtonsCity()
