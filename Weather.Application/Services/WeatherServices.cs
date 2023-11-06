@@ -13,7 +13,6 @@ namespace Weather.Application.Services
 {
     public class WeatherServices : IWeatherServices /*, IHttpClientService*/
     {
-        private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         public string _uri;
         public static string NowCity = "Tashkent";
@@ -21,11 +20,9 @@ namespace Weather.Application.Services
 
         public WeatherServices(IHttpClientFactory httpClientFactory,/*HttpClient httpClient, */IConfiguration configuration)
         {
-            //_httpClient = httpClient;
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _uri = _configuration.GetSection("BaseAddress")["Tashkent"];
-            //_httpClient.BaseAddress = new Uri($"{_uri}");
         }
         //////////////////////////
         //public void Dispose()
@@ -43,10 +40,6 @@ namespace Weather.Application.Services
             var responseModel = await response.Content.ReadFromJsonAsync<WeatherForecast>();
 
             return responseModel;
-            //var response = await _httpClient.GetAsync("").ConfigureAwait(false);
-            //var responseModel = await response.Content.ReadFromJsonAsync<WeatherForecast>();
-
-            //return responseModel;
         }
 
         public async Task<string> GetWeatherToday()
@@ -101,8 +94,6 @@ namespace Weather.Application.Services
         }
         public async Task<string> ChangeCity(string city)
         {
-            //using var httpClient = _httpClientFactory.CreateClient();
-            //httpClient.BaseAddress = new Uri(_configuration.GetSection("BaseAddress")[city]);
             _uri = _configuration.GetSection("BaseAddress")[city];
             NowCity = city;
             return city;
